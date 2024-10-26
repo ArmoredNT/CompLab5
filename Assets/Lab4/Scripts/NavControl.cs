@@ -5,18 +5,56 @@ using UnityEngine.AI;
 
 public class NavControl : MonoBehaviour
 {
-    public GameObject Target;
+    [SerializeField] private Camera cam;
     private NavMeshAgent agent;
+    bool isWalking = true;
+    private Animator animator;
 
-    // Start is called before the first frame update
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
+    // void Update()
+    // {
+    //     if (isWalking)
+    //         agent.destination = TargetAttack.transform.position;
+    //     else
+    //         agent.destination = transform.position;
+    // }
+
     void Update()
     {
-        agent.destination = Target.transform.position;
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit))
+            {
+                agent.SetDestination(hit.point);
+            }
+        }
     }
+    
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.name == "Dragon")
+        {
+            isWalking = false;
+            animator.SetTrigger("ATTACK");
+            print("hhfhf");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.name == "Dragon")
+        {
+            isWalking = true;
+            animator.SetTrigger("WALK");
+        }
+    }
+
 }
